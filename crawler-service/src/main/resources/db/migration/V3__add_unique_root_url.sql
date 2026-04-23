@@ -1,0 +1,1 @@
+ALTER TABLE sites ADD CONSTRAINT unique_root_url UNIQUE (root_url);

@@ -1,5 +1,8 @@
 name: CI/CD Pipeline
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [ main ]
@@ -20,6 +23,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
+      - name: Make mvnw executable
+        run: |
+          chmod +x crawler-service/mvnw
+          chmod +x checker-service/mvnw
+          chmod +x alert-service/mvnw
 
       - name: Run tests — Crawler Service
         run: cd crawler-service && ./mvnw test

@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface DiscoveredLinkRepository extends JpaRepository<DiscoveredLink, UUID> {
 
     boolean existsBySiteIdAndUrl(UUID siteId, String url);
+    long countBySiteId(UUID siteId);
 }

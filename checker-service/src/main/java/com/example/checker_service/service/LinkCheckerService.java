@@ -34,7 +34,7 @@ public class LinkCheckerService {
         String redirectUrl = null;
 
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(job.getUrl()).openConnection();
+            HttpURLConnection connection = openConnection(job.getUrl());
 
             connection.setRequestMethod("HEAD");
             connection.setConnectTimeout(5000);
@@ -111,5 +111,9 @@ public class LinkCheckerService {
         }
 
         return Optional.empty();
+    }
+
+    protected HttpURLConnection openConnection(String url) throws IOException {
+        return (HttpURLConnection) new URL(url).openConnection();
     }
 }

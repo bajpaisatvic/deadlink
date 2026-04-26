@@ -1,12 +1,16 @@
 package com.example.crawler_service.service;
 
+import com.example.crawler_service.dto.SiteDetailsResponse;
 import com.example.crawler_service.dto.SiteRegistrationRequest;
 import com.example.crawler_service.dto.SiteRegistrationResponse;
 import com.example.crawler_service.model.Site;
+import com.example.crawler_service.repository.DiscoveredLinkRepository;
 import com.example.crawler_service.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +19,7 @@ public class SiteService {
 
     private final SiteRepository siteRepository;
     private final CrawlerService crawlerService;
+    private final DiscoveredLinkRepository  discoveredLinkRepository;
 
     public SiteRegistrationResponse registerSite(SiteRegistrationRequest request) {
 
@@ -41,6 +46,25 @@ public class SiteService {
         return new SiteRegistrationResponse(
                 saved.getId(),
                 "Site registered successfully. Crawl will start shortly."
+        );
+    }
+
+    public SiteDetailsResponse getSiteDetails(UUID siteId) {
+        Site site = siteRepository.findById(siteId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Site not found: " + siteId));
+
+        long totalLinks = discoveredLinkRepository.countBySiteId(siteId);
+
+        return new SiteDetailsResponse(
+                site.getId(),
+                site.getName(),
+                site.getRootUrl(),
+                site.getCrawlDepth(),
+                site.getCheckInterval(),
+                site.getCreatedAt(),
+                site.getLastCrawledAt(),
+                totalLinks
         );
     }
 }

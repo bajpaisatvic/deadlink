@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +68,29 @@ public class SiteService {
                 site.getLastCrawledAt(),
                 totalLinks
         );
+    }
+
+    public void triggerCrawl(UUID siteId) {
+        Site site = siteRepository.findById(siteId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Site not found: " + siteId));
+
+        log.info("Manual crawl triggered for site: {}", site.getRootUrl());
+        new Thread(() -> crawlerService.crawl(site)).start();
+    }
+
+    public List<SiteDetailsResponse> getAllSites() {
+        return siteRepository.findAll().stream()
+                .map(site -> new SiteDetailsResponse(
+                        site.getId(),
+                        site.getName(),
+                        site.getRootUrl(),
+                        site.getCrawlDepth(),
+                        site.getCheckInterval(),
+                        site.getCreatedAt(),
+                        site.getLastCrawledAt(),
+                        discoveredLinkRepository.countBySiteId(site.getId())
+                ))
+                .collect(Collectors.toList());
     }
 }
